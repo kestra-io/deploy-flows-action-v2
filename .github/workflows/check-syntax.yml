@@ -1,0 +1,28 @@
+name: Check syntax
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check-syntax:
+    name: Lint workflow and validate action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint workflows (actionlint)
+        shell: bash
+        run: |
+          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
+          ./actionlint -color
+
+      - name: Validate composite action (action-validator)
+        shell: bash
+        run: npx --yes @action-validator/cli@0.6.0 action.yml
