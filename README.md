@@ -26,7 +26,7 @@ Split out of [`kestra-io/github-actions`](https://github.com/kestra-io/github-ac
 | `apiToken` | API Token (EE only) | - |
 | `user` / `password` | Basic auth credentials | - |
 | `tenant` | Tenant identifier (EE only) | `main` |
-| `kestractlVersion` | Version of [kestractl](https://github.com/kestra-io/kestractl) to use | `1.0.0` |
+| `kestractlVersion` | Version of [kestractl](https://github.com/kestra-io/kestractl) to use | `latest` |
 
 ## Links
 - Docs: https://kestra.io/docs/how-to-guides/github-actions

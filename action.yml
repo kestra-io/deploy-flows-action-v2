@@ -31,7 +31,7 @@ inputs:
     required: true
   kestractlVersion:
     description: "version of kestractl (see https://github.com/kestra-io/kestractl)"
-    default: '1.0.0'
+    default: 'latest'
 runs:
   using: "composite"
   steps:
