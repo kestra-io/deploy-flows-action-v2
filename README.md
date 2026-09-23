@@ -22,6 +22,8 @@ Split out of [`kestra-io/github-actions`](https://github.com/kestra-io/github-ac
 | `directory` | Folder containing your flows | `./` |
 | `namespace` | Force a namespace to deploy flows to | - |
 | `override` | Override flows if they already exist | `false` |
+| `recursive` | Recurse into subdirectories when `directory` is a folder | `true` |
+| `failFast` | Stop on the first deployment error | `false` |
 | `server` | URL of your Kestra server | required |
 | `apiToken` | API Token (EE only) | - |
 | `user` / `password` | Basic auth credentials | - |

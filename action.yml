@@ -13,6 +13,12 @@ inputs:
   override:
     description: 'to override flows if they already exist or not'
     default: 'false'
+  recursive:
+    description: 'recurse into subdirectories when directory is provided'
+    default: 'true'
+  failFast:
+    description: 'stop on the first deployment error'
+    default: 'false'
   server:
     description: 'URL of your Kestra server'
     required: true
@@ -51,6 +57,12 @@ runs:
         fi
         if [ "${{inputs.override}}" = "true" ]; then
           OPTS="$OPTS --override"
+        fi
+        if [ "${{inputs.recursive}}" = "false" ]; then
+          OPTS="$OPTS --recursive=false"
+        fi
+        if [ "${{inputs.failFast}}" = "true" ]; then
+          OPTS="$OPTS --fail-fast"
         fi
         if [ -n "${{inputs.apiToken}}" ]; then
           OPTS="$OPTS --token ${{inputs.apiToken}}"
