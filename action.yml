@@ -66,22 +66,23 @@ runs:
         INPUT_SERVER: ${{ inputs.server }}
         INPUT_TENANT: ${{ inputs.tenant }}
       run: |
-        OPTS=""
+        args=(flows deploy "$INPUT_DIRECTORY" --host "$INPUT_SERVER" --tenant "$INPUT_TENANT")
         if [ -n "$INPUT_NAMESPACE" ]; then
-          OPTS="$OPTS --namespace $INPUT_NAMESPACE"
+          args+=(--namespace "$INPUT_NAMESPACE")
         fi
         if [ "$INPUT_OVERRIDE" = "true" ]; then
-          OPTS="$OPTS --override"
+          args+=(--override)
         fi
         if [ "$INPUT_RECURSIVE" = "false" ]; then
-          OPTS="$OPTS --recursive=false"
+          args+=(--recursive=false)
         fi
         if [ "$INPUT_FAIL_FAST" = "true" ]; then
-          OPTS="$OPTS --fail-fast"
+          args+=(--fail-fast)
         fi
         if [ -n "$INPUT_API_TOKEN" ]; then
-          OPTS="$OPTS --token $INPUT_API_TOKEN"
+          export KESTRACTL_TOKEN="$INPUT_API_TOKEN"
         elif [ -n "$INPUT_USER" ] && [ -n "$INPUT_PASSWORD" ]; then
-          OPTS="$OPTS --username $INPUT_USER --password $INPUT_PASSWORD"
+          unset KESTRACTL_TOKEN
+          export KESTRACTL_USERNAME="$INPUT_USER" KESTRACTL_PASSWORD="$INPUT_PASSWORD"
         fi
-        ./kestractl flows deploy $INPUT_DIRECTORY --host $INPUT_SERVER --tenant $INPUT_TENANT $OPTS
+        ./kestractl "${args[@]}"
