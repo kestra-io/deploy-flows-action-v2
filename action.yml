@@ -43,30 +43,46 @@ runs:
   steps:
     - name: Install CLI
       shell: bash
-      run: curl -fsSL https://raw.githubusercontent.com/kestra-io/kestractl/main/install-scripts/install.sh | VERSION='${{inputs.kestractlVersion}}' INSTALL_DIR='./' bash
+      env:
+        VERSION: ${{ inputs.kestractlVersion }}
+        INSTALL_DIR: ./
+      run: |
+        curl -fsSL -o "$RUNNER_TEMP/kestractl-install.sh" https://raw.githubusercontent.com/kestra-io/kestractl/main/install-scripts/install.sh
+        bash "$RUNNER_TEMP/kestractl-install.sh"
 
     - name: Run CLI
       shell: bash
       env:
         # indicate in telemetry that kestractl was called from our action
         KESTRACTL_GITHUB_ACTION: "true"
+        INPUT_DIRECTORY: ${{ inputs.directory }}
+        INPUT_NAMESPACE: ${{ inputs.namespace }}
+        INPUT_OVERRIDE: ${{ inputs.override }}
+        INPUT_RECURSIVE: ${{ inputs.recursive }}
+        INPUT_FAIL_FAST: ${{ inputs.failFast }}
+        INPUT_API_TOKEN: ${{ inputs.apiToken }}
+        INPUT_USER: ${{ inputs.user }}
+        INPUT_PASSWORD: ${{ inputs.password }}
+        INPUT_SERVER: ${{ inputs.server }}
+        INPUT_TENANT: ${{ inputs.tenant }}
       run: |
-        OPTS=""
-        if [ -n "${{inputs.namespace}}" ]; then
-          OPTS="$OPTS --namespace ${{inputs.namespace}}"
+        args=(flows deploy "$INPUT_DIRECTORY" --host "$INPUT_SERVER" --tenant "$INPUT_TENANT")
+        if [ -n "$INPUT_NAMESPACE" ]; then
+          args+=(--namespace "$INPUT_NAMESPACE")
         fi
-        if [ "${{inputs.override}}" = "true" ]; then
-          OPTS="$OPTS --override"
+        if [ "$INPUT_OVERRIDE" = "true" ]; then
+          args+=(--override)
         fi
-        if [ "${{inputs.recursive}}" = "false" ]; then
-          OPTS="$OPTS --recursive=false"
+        if [ "$INPUT_RECURSIVE" = "false" ]; then
+          args+=(--recursive=false)
         fi
-        if [ "${{inputs.failFast}}" = "true" ]; then
-          OPTS="$OPTS --fail-fast"
+        if [ "$INPUT_FAIL_FAST" = "true" ]; then
+          args+=(--fail-fast)
         fi
-        if [ -n "${{inputs.apiToken}}" ]; then
-          OPTS="$OPTS --token ${{inputs.apiToken}}"
-        elif [ -n "${{inputs.user}}" ] && [ -n "${{inputs.password}}" ]; then
-          OPTS="$OPTS --username ${{inputs.user}} --password ${{inputs.password}}"
+        if [ -n "$INPUT_API_TOKEN" ]; then
+          export KESTRACTL_TOKEN="$INPUT_API_TOKEN"
+        elif [ -n "$INPUT_USER" ] && [ -n "$INPUT_PASSWORD" ]; then
+          unset KESTRACTL_TOKEN
+          export KESTRACTL_USERNAME="$INPUT_USER" KESTRACTL_PASSWORD="$INPUT_PASSWORD"
         fi
-        ./kestractl flows deploy ${{inputs.directory}} --host ${{inputs.server}} --tenant ${{inputs.tenant}} $OPTS
+        ./kestractl "${args[@]}"
